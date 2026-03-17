@@ -3,18 +3,24 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A tour through my self-hosted setup</title>
+    <title>There's no place like 127.0.0.1</title>
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.0/dist/reset.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.0/dist/reveal.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.0/dist/theme/night.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.0/plugin/highlight/monokai.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.0/dist/plugin/highlight/monokai.css">
     <style>
         :root{
-            --r-link-color: #9DE94B;
-            --r-link-color-dark: #469B13;
-            --r-link-color-hover: var(--r-link-color-dark);
-            --r-selection-background-color: var(--r-link-color);
+            --green-light: #9DE94B;
+            --green-drak: #469B13;
+            --r-link-color: var(--green-light);
+            --r-link-color-dark: var(--green-drak);
+            --r-link-color-hover: var(--green-drak);
+            --r-selection-background-color: var(--green-light);
+        }
+
+        .reveal blockquote {
+            font-size: 30px;
         }
     </style>
 </head>
@@ -25,7 +31,7 @@
         <!-- INTRO -->
         <!-- ============================================ -->
         <section>
-            <section data-background-gradient="linear-gradient(to bottom, #9DE94B, #469B13)">
+            <section data-background-gradient="linear-gradient(to bottom, var(--green-light), var(--green-drak))">
                 <h2>There's no place like 127.0.0.1</h2>
                 <img src="assets/images/dnsaur.svg" alt="Intro" height="350">
             </section>
@@ -41,47 +47,46 @@
                 <p>Inspired by <a href="https://www.reddit.com/r/selfhosted/">r/selfhosted</a></p>
             </section>
         </section>
-
         <!-- ============================================ -->
         <!-- THE HARDWARE -->
         <!-- ============================================ -->
         <section>
             <section>
                 <h2>The hardware</h2>
-                <h3>No self-hosting without the right box</h3>
+                <p>No self-hosting without the right hardware</p>
             </section>
             <section>
                 <h3>Beelink EQR5 MINI PC</h3>
-                <ul>
-                    <li>AMD Ryzen processor</li>
-                    <li>32 GB RAM</li>
-                    <li>500 GB SSD</li>
-                    <li>Runs Ubuntu Server</li>
-                </ul>
-                <img src="assets/images/beelink.png" alt="Beelink EQR5">
+                <div style="display: flex; column-gap: 10px; align-items: center;">
+                    <img src="assets/images/beelink.png" alt="Beelink EQR5">
+                    <ul>
+                        <li>AMD Ryzen processor</li>
+                        <li>32 GB RAM</li>
+                        <li>500 GB SSD</li>
+                        <li>Runs Ubuntu Server</li>
+                    </ul>
+                </div>
             </section>
             <section>
                 <h3>The routing layer</h3>
-                <p>No fancy router needed &mdash; the ISP's default router does the job.</p>
+                <p>No fancy router needed, the ISP's default router does the job.</p>
                 <ul>
                     <li>Full control over DNS</li>
                     <li>Full control over DHCP</li>
                 </ul>
                 <br>
                 <div>
-                    <p>Total hardware cost</p>
-                    <p>$319</p>
+                    <p>Total hardware cost: €319</p>
                 </div>
             </section>
         </section>
-
         <!-- ============================================ -->
         <!-- CREATING THE PROPER ACCOUNTS -->
         <!-- ============================================ -->
         <section>
             <section>
                 <h2>Creating the proper accounts</h2>
-                <h3>Free tiers for the win</h3>
+                <p>Free tiers for the win</p>
             </section>
             <section>
                 <h3>Tailscale</h3>
@@ -89,27 +94,25 @@
                 <ul>
                     <li>VPN access to my home network</li>
                     <li>Free tier is more than enough</li>
-                    <li>Just sign up &mdash; no config needed yet</li>
+                    <li>Just sign up, no config needed yet</li>
                 </ul>
             </section>
             <section>
                 <h3>Cloudflare</h3>
                 <blockquote>Protect everything you connect to the Internet</blockquote>
                 <ul>
-                    <li>Updated domain registrar's nameservers to Cloudflare</li>
+                    <li>Update domain registrar's nameservers to Cloudflare</li>
                     <li>DNS and proxy configuration comes later</li>
-                    <li>Also free tier</li>
                 </ul>
             </section>
         </section>
-
         <!-- ============================================ -->
         <!-- BEFORE INSTALLING ANY APPS -->
         <!-- ============================================ -->
         <section>
             <section>
                 <h2>Before installing any apps</h2>
-                <h3>Building a solid foundation</h3>
+                <p>Building a solid foundation</p>
             </section>
             <section>
                 <h3>Configuring my router</h3>
@@ -123,7 +126,8 @@
             <section>
                 <h3>Configuring Ubuntu Server</h3>
                 <p>Install Docker &amp; enable it on boot:</p>
-                <pre><code class="language-bash"># Install Docker
+                <blockquote>Docker packages apps into portable containers that run anywhere</blockquote>
+                <pre><code data-trim data-noescape data-line-numbers># Install Docker
 sudo apt update
 sudo apt upgrade -y
 curl -sSL https://get.docker.com | sh
@@ -154,7 +158,7 @@ sudo systemctl enable docker</code></pre>
         <section>
             <section>
                 <h2>Traefik</h2>
-                <h3>The reverse proxy I fell in love with</h3>
+                <p>The reverse proxy I fell in love with</p>
             </section>
             <section>
                 <h3>Why a reverse proxy?</h3>
@@ -166,7 +170,7 @@ sudo systemctl enable docker</code></pre>
             </section>
             <section>
                 <h3>Configuration via Docker labels</h3>
-                <pre><code class="language-yaml">services:
+                <pre><code class="language-yaml" data-trim data-noescape data-line-numbers>services:
   core:
     image: ghcr.io/a-cool-docker-image
     restart: unless-stopped
@@ -192,7 +196,7 @@ networks:
             </section>
             <section>
                 <h3>Traefik Docker config</h3>
-                <pre><code class="language-yaml">services:
+                <pre><code class="language-yaml" data-trim data-noescape data-line-numbers>services:
   traefik:
     image: traefik:v3.2
     container_name: traefik
@@ -210,14 +214,13 @@ networks:
       - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}</code></pre>
             </section>
         </section>
-
         <!-- ============================================ -->
         <!-- MANAGING ALL MY CONTAINERS -->
         <!-- ============================================ -->
         <section>
             <section>
                 <h2>Managing all my containers</h2>
-                <h3>One tool to rule them all</h3>
+                <p>One tool to rule them all</p>
             </section>
             <section>
                 <h3>Komodo</h3>
@@ -236,7 +239,7 @@ networks:
         <section>
             <section>
                 <h2>Documentation is key</h2>
-                <h3>Because future-you will thank you</h3>
+                <p>Because future-you will thank you</p>
             </section>
             <section>
                 <h3>Wiki.js</h3>
@@ -263,16 +266,16 @@ networks:
         <section>
             <section>
                 <h2>Organizing my apps in one place</h2>
-                <h3>A dashboard for everything</h3>
+                <p>A dashboard for everything</p>
             </section>
             <section>
                 <h3>Homepage</h3>
                 <blockquote>A highly customizable homepage with Docker and service API integrations.</blockquote>
-                <p>Configured entirely through Docker labels &mdash;<br>no separate config file needed.</p>
+                <p>Configured entirely through Docker labels.</p>
             </section>
             <section>
                 <h3>Configuration via labels</h3>
-                <pre><code class="language-yaml">services:
+                <pre><code class="language-yaml" data-trim data-noescape data-line-numbers>services:
   core:
     image: ghcr.io/a-cool-docker-image
     restart: unless-stopped
@@ -298,7 +301,7 @@ networks:
         <section>
             <section>
                 <h2>Keeping an eye on everything</h2>
-                <h3>Monitoring &amp; notifications</h3>
+                <p>Monitoring &amp; notifications</p>
             </section>
             <section>
                 <h3>ntfy.sh</h3>
@@ -334,7 +337,7 @@ networks:
         <section>
             <section>
                 <h2>Backups, because disaster will strike</h2>
-                <h3>The 3-2-1 strategy</h3>
+                <p>The 3-2-1 strategy</p>
             </section>
             <section>
                 <h3>The 3-2-1 backup rule</h3>
@@ -363,18 +366,18 @@ networks:
         <section>
             <section>
                 <h2>Exposing my apps to the world wide web</h2>
-                <h3>Securely going public</h3>
+                <p>Securely going public</p>
             </section>
             <section>
                 <h3>The challenge</h3>
                 <p>Some services need to be publicly accessible,<br>like <a
                         href="https://resume.robiningelbrecht.be/robin/php-developer">my resume</a>.</p>
-                <p>But security comes first &mdash; no random access<br>to the server or local network.</p>
+                <p>But security comes first, no random access<br>to the server or local network.</p>
             </section>
             <section>
                 <h3>Cloudflare Tunnels + Tailscale</h3>
                 <p>Created a Cloudflared tunnel via<br><strong>Zero Trust &rarr; Network &rarr; Tunnels</strong></p>
-                <pre><code class="language-yaml">services:
+                <pre><code class="language-yaml" data-trim data-noescape data-line-numbers>services:
   tunnel:
     image: cloudflare/cloudflared
     restart: unless-stopped
