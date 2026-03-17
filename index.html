@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A tour through my self-hosted setup</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.0/dist/theme/night.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.0/plugin/highlight/monokai.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+  <!-- ============================================ -->
+  <!-- INTRO -->
+  <!-- ============================================ -->
+  <section>
+    <section>
+      <h2>There's no place like 127.0.0.1</h2>
+      <h3>A tour through my self-hosted setup</h3>
+      <p>How it runs, how I update it, and how I (try to)<br>keep it all from catching fire</p>
+    </section>
+    <section>
+      <h2>What is self-hosting?</h2>
+      <p>Running your own apps and services on hardware you control,<br>instead of relying on third-party cloud providers.</p>
+      <br>
+      <p>Inspired by <a href="https://www.reddit.com/r/selfhosted/">r/selfhosted</a></p>
+    </section>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- THE HARDWARE -->
+  <!-- ============================================ -->
+  <section>
+    <section>
+      <h2>The hardware</h2>
+      <h3>No self-hosting without the right box</h3>
+    </section>
+    <section>
+      <h3>Beelink EQR5 MINI PC</h3>
+      <ul>
+        <li>AMD Ryzen processor</li>
+        <li>32 GB RAM</li>
+        <li>500 GB SSD</li>
+        <li>Runs Ubuntu Server</li>
+      </ul>
+      <img src="assets/images/beelink.png" alt="Beelink EQR5">
+    </section>
+    <section>
+      <h3>The routing layer</h3>
+      <p>No fancy router needed &mdash; the ISP's default router does the job.</p>
+      <ul>
+        <li>Full control over DNS</li>
+        <li>Full control over DHCP</li>
+      </ul>
+      <br>
+      <div>
+        <p>Total hardware cost</p>
+        <p>$319</p>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- CREATING THE PROPER ACCOUNTS -->
+  <!-- ============================================ -->
+  <section>
+    <section>
+      <h2>Creating the proper accounts</h2>
+      <h3>Free tiers for the win</h3>
+    </section>
+    <section>
+      <h3>Tailscale</h3>
+      <blockquote>Securely connect to anything on the internet</blockquote>
+      <ul>
+        <li>VPN access to my home network</li>
+        <li>Free tier is more than enough</li>
+        <li>Just sign up &mdash; no config needed yet</li>
+      </ul>
+    </section>
+    <section>
+      <h3>Cloudflare</h3>
+      <blockquote>Protect everything you connect to the Internet</blockquote>
+      <ul>
+        <li>Updated domain registrar's nameservers to Cloudflare</li>
+        <li>DNS and proxy configuration comes later</li>
+        <li>Also free tier</li>
+      </ul>
+    </section>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- BEFORE INSTALLING ANY APPS -->
+  <!-- ============================================ -->
+  <section>
+    <section>
+      <h2>Before installing any apps</h2>
+      <h3>Building a solid foundation</h3>
+    </section>
+    <section>
+      <h3>Configuring my router</h3>
+      <p>Set up DHCP reservations for predictable IP addresses:</p>
+      <ul>
+        <li>Beelink server</li>
+        <li>Network printer</li>
+        <li>Raspberry Pi</li>
+      </ul>
+    </section>
+    <section>
+      <h3>Configuring Ubuntu Server</h3>
+      <p>Install Docker &amp; enable it on boot:</p>
+      <pre><code class="language-bash"># Install Docker
+sudo apt update
+sudo apt upgrade -y
+curl -sSL https://get.docker.com | sh
+
+# Add current user to the docker group
+sudo usermod -aG docker $USER
+logout
+
+# Run containers on boot
+sudo systemctl enable docker</code></pre>
+    </section>
+    <section>
+      <h3>Connecting the dots</h3>
+      <p>Install Tailscale client on the server</p>
+      <img src="assets/images/tailscale-add-device.png" alt="Adding a Linux device to Tailscale">
+    </section>
+    <section>
+      <h3>DNS configuration</h3>
+      <p>Point all subdomains to the Tailscale IP address in Cloudflare:</p>
+      <img src="assets/images/cloudflare-dns.png" alt="Cloudflare DNS A records">
+      <p>Server is now fully reachable over the VPN</p>
+    </section>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- TRAEFIK -->
+  <!-- ============================================ -->
+  <section>
+    <section>
+      <h2>Traefik</h2>
+      <h3>The reverse proxy I fell in love with</h3>
+    </section>
+    <section>
+      <h3>Why a reverse proxy?</h3>
+      <blockquote>A reverse proxy receives incoming network requests and routes them to the correct backend service.</blockquote>
+      <p>Access services via <strong>subdomains</strong> instead of<br>ugly port numbers:</p>
+      <p><code>https://app.domain.tld</code> &nbsp;vs&nbsp; <code>http://192.168.1.10:8080</code></p>
+    </section>
+    <section>
+      <h3>Configuration via Docker labels</h3>
+      <pre><code class="language-yaml">services:
+  core:
+    image: ghcr.io/a-cool-docker-image
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.app-name.rule=Host(`subdomain.root.tld`)
+    networks:
+      - traefik_default
+networks:
+  traefik_default:
+    external: true</code></pre>
+    </section>
+    <section>
+      <h3>Securing everything with HTTPS</h3>
+      <p>Traefik + Cloudflare certificate resolver</p>
+      <ul>
+        <li>Generate an API key in Cloudflare</li>
+        <li>Traefik automatically requests &amp; renews TLS certificates</li>
+      </ul>
+      <img src="assets/images/cloudflare-api-token.png" alt="Cloudflare API token">
+    </section>
+    <section>
+      <h3>Traefik Docker config</h3>
+      <pre><code class="language-yaml">services:
+  traefik:
+    image: traefik:v3.2
+    container_name: traefik
+    restart: unless-stopped
+    privileged: true
+    command:
+      - --entrypoints.websecure.http.tls=true
+      - --entrypoints.websecure.http.tls.certResolver=dns-cloudflare
+      - --entrypoints.websecure.http.tls.domains[0].sans=*.root.tld
+      - --certificatesresolvers.dns-cloudflare.acme.dnschallenge=true
+      - --certificatesresolvers.dns-cloudflare.acme.dnschallenge.provider=cloudflare
+      - --certificatesresolvers.dns-cloudflare.acme.dnschallenge.delayBeforeCheck=10
+      - --certificatesresolvers.dns-cloudflare.acme.storage=storage/acme.json
+    environment:
+      - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}</code></pre>
+    </section>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- MANAGING ALL MY CONTAINERS -->
+  <!-- ============================================ -->
+  <section>
+    <section>
+      <h2>Managing all my containers</h2>
+      <h3>One tool to rule them all</h3>
+    </section>
+    <section>
+      <h3>Komodo</h3>
+      <blockquote>A tool to build and deploy software on many servers</blockquote>
+      <ul>
+        <li>Handles configuration, building, and updates</li>
+        <li>Clean UI to manage all Docker containers</li>
+      </ul>
+      <img src="assets/images/komodo-overview.png" alt="Komodo overview">
+    </section>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- DOCUMENTATION IS KEY -->
+  <!-- ============================================ -->
+  <section>
+    <section>
+      <h2>Documentation is key</h2>
+      <h3>Because future-you will thank you</h3>
+    </section>
+    <section>
+      <h3>Wiki.js</h3>
+      <p>A modern and powerful wiki app to document everything<br>from the very beginning.</p>
+      <ul>
+        <li>If the server breaks down &rarr; rebuild from docs</li>
+        <li>Sensible category structure for all notes</li>
+      </ul>
+      <img src="assets/images/wikijs-menu.png" alt="Wiki.js menu structure">
+    </section>
+    <section>
+      <h3>Git-backed documentation</h3>
+      <p>Wiki.js backs up all content to private Git repositories.</p>
+      <ul>
+        <li>Server fails? Markdown copies are still safe</li>
+        <li>Easy import into a fresh Wiki.js instance</li>
+      </ul>
+    </section>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- ORGANIZING MY APPS IN ONE PLACE -->
+  <!-- ============================================ -->
+  <section>
+    <section>
+      <h2>Organizing my apps in one place</h2>
+      <h3>A dashboard for everything</h3>
+    </section>
+    <section>
+      <h3>Homepage</h3>
+      <blockquote>A highly customizable homepage with Docker and service API integrations.</blockquote>
+      <p>Configured entirely through Docker labels &mdash;<br>no separate config file needed.</p>
+    </section>
+    <section>
+      <h3>Configuration via labels</h3>
+      <pre><code class="language-yaml">services:
+  core:
+    image: ghcr.io/a-cool-docker-image
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    labels:
+      - homepage.group=Misc
+      - homepage.name=Stirling PDF
+      - homepage.href=https://stirlingpdf.domain.tld
+      - homepage.icon=sh-stirling-pdf.png
+      - homepage.description=Locally hosted app for PDF operations</code></pre>
+    </section>
+    <section>
+      <h3>The result</h3>
+      <img src="assets/images/homepage-dashboard.png" alt="Homepage dashboard">
+      <p>Clean and simple dashboard</p>
+    </section>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- KEEPING AN EYE ON EVERYTHING -->
+  <!-- ============================================ -->
+  <section>
+    <section>
+      <h2>Keeping an eye on everything</h2>
+      <h3>Monitoring &amp; notifications</h3>
+    </section>
+    <section>
+      <h3>ntfy.sh</h3>
+      <p>Self-hosted HTTP-based pub-sub notification service.</p>
+      <ul>
+        <li>Private notification channels</li>
+        <li>3 channels: backups, app updates, OSS project</li>
+      </ul>
+      <img src="assets/images/ntfy-channels.png" alt="ntfy.sh channels">
+    </section>
+    <section>
+      <h3>What's Up Docker? (WUD)</h3>
+      <p>Monitors Docker images and sends notifications<br>whenever a new version is released.</p>
+      <ul>
+        <li>Integrates with ntfy.sh</li>
+        <li>Never miss an update again</li>
+      </ul>
+      <img src="assets/images/wud-architecture.png" alt="WUD architecture">
+    </section>
+    <section>
+      <h3>Uptime Kuma</h3>
+      <p>Self-hosted monitoring tool that alerts you<br>whenever a service or app goes down.</p>
+      <ul>
+        <li>Monitors all services</li>
+        <li>Instant alerts when something needs attention</li>
+      </ul>
+    </section>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- BACKUPS -->
+  <!-- ============================================ -->
+  <section>
+    <section>
+      <h2>Backups, because disaster will strike</h2>
+      <h3>The 3-2-1 strategy</h3>
+    </section>
+    <section>
+      <h3>The 3-2-1 backup rule</h3>
+      <blockquote>Keep three copies of your data, on two different media, with one copy off-site.</blockquote>
+      <ul>
+        <li><strong>Copy 1:</strong> On the server itself</li>
+        <li><strong>Copy 2:</strong> On a separate hard drive</li>
+        <li><strong>Copy 3:</strong> On Cloudflare R2 (off-site)</li>
+      </ul>
+    </section>
+    <section>
+      <h3>Zerobyte + Restic</h3>
+      <p>Zerobyte is built on top of Restic, a powerful CLI-based backup tool.</p>
+      <ul>
+        <li>Configure repositories following the 3-2-1 strategy</li>
+        <li>Set up a backup schedule</li>
+        <li>Zerobyte takes care of the rest</li>
+      </ul>
+      <img src="assets/images/backup-strategy.png" alt="Backup strategy">
+    </section>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- EXPOSING APPS TO THE WEB -->
+  <!-- ============================================ -->
+  <section>
+    <section>
+      <h2>Exposing my apps to the world wide web</h2>
+      <h3>Securely going public</h3>
+    </section>
+    <section>
+      <h3>The challenge</h3>
+      <p>Some services need to be publicly accessible,<br>like <a href="https://resume.robiningelbrecht.be/robin/php-developer">my resume</a>.</p>
+      <p>But security comes first &mdash; no random access<br>to the server or local network.</p>
+    </section>
+    <section>
+      <h3>Cloudflare Tunnels + Tailscale</h3>
+      <p>Created a Cloudflared tunnel via<br><strong>Zero Trust &rarr; Network &rarr; Tunnels</strong></p>
+      <pre><code class="language-yaml">services:
+  tunnel:
+    image: cloudflare/cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=[CLOUDFLARE-TOKEN]</code></pre>
+    </section>
+    <section>
+      <h3>Tunnel in action</h3>
+      <img src="assets/images/cloudflare-tunnel.png" alt="Cloudflare tunnel active">
+      <p>Cloudflare picks up the tunnel</p>
+    </section>
+    <section>
+      <h3>Public hostname</h3>
+      <p>Added a public hostname pointing to the Tailscale IP address.</p>
+      <img src="assets/images/public-hostname.png" alt="Public hostname record">
+      <p>Service accessible from the internet, server stays hidden</p>
+    </section>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- FINAL THOUGHTS -->
+  <!-- ============================================ -->
+  <section>
+    <section>
+      <h2>Final Thoughts</h2>
+    </section>
+    <section>
+      <p>Self-hosting started as a curiosity, but it quickly became<br>one of the most satisfying projects I've ever done.</p>
+      <br>
+      <p>It's part <strong>tinkering</strong>, part <strong>control</strong>, part <strong>obsession</strong>.</p>
+      <br>
+      <p>There's something deeply comforting about knowing that all your services<br>live on a box you can physically touch.</p>
+    </section>
+    <section>
+      <h2>Thank you!</h2>
+      <p>This is simply the setup that works well for me.<br>There are many valid ways to build a homeserver.</p>
+    </section>
+  </section>
+
+</div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "reveal.js": "https://cdn.jsdelivr.net/npm/reveal.js@6.0.0/dist/reveal.mjs",
+    "reveal.js/plugin/highlight": "https://cdn.jsdelivr.net/npm/reveal.js@6.0.0/dist/plugin/highlight.mjs"
+  }
+}
+</script>
+<script type="module">
+  import Reveal from 'reveal.js';
+  import RevealHighlight from 'reveal.js/plugin/highlight';
+
+  Reveal.initialize({
+    hash: true,
+    slideNumber: true,
+    transition: 'slide',
+    plugins: [RevealHighlight]
+  });
+</script>
+</body>
+</html>
