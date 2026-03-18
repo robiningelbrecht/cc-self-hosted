@@ -58,7 +58,7 @@
             <section>
                 <h3>Beelink EQR5 MINI PC</h3>
                 <div style="display: flex; column-gap: 10px; align-items: center;">
-                    <img src="assets/images/beelink.png" alt="Beelink EQR5">
+                    <img src="assets/images/beelink.jpg" width="500" alt="Beelink EQR5">
                     <ul>
                         <li>AMD Ryzen processor</li>
                         <li>32 GB RAM</li>
@@ -94,7 +94,6 @@
                 <ul>
                     <li>VPN access to my home network</li>
                     <li>Free tier is more than enough</li>
-                    <li>Just sign up, no config needed yet</li>
                 </ul>
             </section>
             <section>
@@ -125,7 +124,7 @@
             </section>
             <section>
                 <h3>Configuring Ubuntu Server</h3>
-                <p>Install Docker &amp; enable it on boot:</p>
+                <p>Install Docker &amp; enable it on boot</p>
                 <blockquote>Docker packages apps into portable containers that run anywhere</blockquote>
                 <pre><code data-trim data-noescape data-line-numbers># Install Docker
 sudo apt update
@@ -142,12 +141,12 @@ sudo systemctl enable docker</code></pre>
             <section>
                 <h3>Connecting the dots</h3>
                 <p>Install Tailscale client on the server</p>
-                <img src="assets/images/tailscale-add-device.png" alt="Adding a Linux device to Tailscale">
+                <img src="assets/images/tailscale-add-device.png" width="700" alt="Adding a Linux device to Tailscale">
             </section>
             <section>
                 <h3>DNS configuration</h3>
                 <p>Point all subdomains to the Tailscale IP address in Cloudflare:</p>
-                <img src="assets/images/cloudflare-dns.png" alt="Cloudflare DNS A records">
+                <img src="assets/images/cloudflare-dns.png" width="700" alt="Cloudflare DNS A records">
                 <p>Server is now fully reachable over the VPN</p>
             </section>
         </section>
@@ -187,12 +186,11 @@ networks:
             </section>
             <section>
                 <h3>Securing everything with HTTPS</h3>
-                <p>Traefik + Cloudflare certificate resolver</p>
                 <ul>
                     <li>Generate an API key in Cloudflare</li>
                     <li>Traefik automatically requests &amp; renews TLS certificates</li>
                 </ul>
-                <img src="assets/images/cloudflare-api-token.png" alt="Cloudflare API token">
+                <img src="assets/images/cloudflare-api-token.png" width="700" alt="Cloudflare API token">
             </section>
             <section>
                 <h3>Traefik Docker config</h3>
@@ -225,11 +223,7 @@ networks:
             <section>
                 <h3>Komodo</h3>
                 <blockquote>A tool to build and deploy software on many servers</blockquote>
-                <ul>
-                    <li>Handles configuration, building, and updates</li>
-                    <li>Clean UI to manage all Docker containers</li>
-                </ul>
-                <img src="assets/images/komodo-overview.png" alt="Komodo overview">
+                <img src="assets/images/komodo-overview.png" width="700"  alt="Komodo overview">
             </section>
         </section>
 
@@ -243,12 +237,8 @@ networks:
             </section>
             <section>
                 <h3>Wiki.js</h3>
-                <p>A modern and powerful wiki app to document everything<br>from the very beginning.</p>
-                <ul>
-                    <li>If the server breaks down &rarr; rebuild from docs</li>
-                    <li>Sensible category structure for all notes</li>
-                </ul>
-                <img src="assets/images/wikijs-menu.png" alt="Wiki.js menu structure">
+                <blockquote>A modern and powerful wiki app to document everything</blockquote>
+                <img src="assets/images/wikijs-menu.png" width="700"  alt="Wiki.js menu structure">
             </section>
             <section>
                 <h3>Git-backed documentation</h3>
@@ -290,7 +280,7 @@ networks:
             </section>
             <section>
                 <h3>The result</h3>
-                <img src="assets/images/homepage-dashboard.png" alt="Homepage dashboard">
+                <img src="assets/images/homepage-dashboard.png"  alt="Homepage dashboard">
                 <p>Clean and simple dashboard</p>
             </section>
         </section>
@@ -306,20 +296,12 @@ networks:
             <section>
                 <h3>ntfy.sh</h3>
                 <p>Self-hosted HTTP-based pub-sub notification service.</p>
-                <ul>
-                    <li>Private notification channels</li>
-                    <li>3 channels: backups, app updates, OSS project</li>
-                </ul>
-                <img src="assets/images/ntfy-channels.png" alt="ntfy.sh channels">
+                <img src="assets/images/ntfy-channels.png" width="700" alt="ntfy.sh channels">
             </section>
             <section>
                 <h3>What's Up Docker? (WUD)</h3>
                 <p>Monitors Docker images and sends notifications<br>whenever a new version is released.</p>
-                <ul>
-                    <li>Integrates with ntfy.sh</li>
-                    <li>Never miss an update again</li>
-                </ul>
-                <img src="assets/images/wud-architecture.png" alt="WUD architecture">
+                <img src="assets/images/wud-architecture.png" width="700" alt="WUD architecture">
             </section>
             <section>
                 <h3>Uptime Kuma</h3>
@@ -351,12 +333,7 @@ networks:
             <section>
                 <h3>Zerobyte + Restic</h3>
                 <p>Zerobyte is built on top of Restic, a powerful CLI-based backup tool.</p>
-                <ul>
-                    <li>Configure repositories following the 3-2-1 strategy</li>
-                    <li>Set up a backup schedule</li>
-                    <li>Zerobyte takes care of the rest</li>
-                </ul>
-                <img src="assets/images/backup-strategy.png" alt="Backup strategy">
+                <img src="assets/images/backup-strategy.png" width="700" alt="Backup strategy">
             </section>
         </section>
 
@@ -371,12 +348,12 @@ networks:
             <section>
                 <h3>The challenge</h3>
                 <p>Some services need to be publicly accessible,<br>like <a
-                        href="https://resume.robiningelbrecht.be/robin/php-developer">my resume</a>.</p>
+                        href="https://resume.robiningelbrecht.be/">my resume</a>.</p>
                 <p>But security comes first, no random access<br>to the server or local network.</p>
             </section>
             <section>
                 <h3>Cloudflare Tunnels + Tailscale</h3>
-                <p>Created a Cloudflared tunnel via<br><strong>Zero Trust &rarr; Network &rarr; Tunnels</strong></p>
+                <p>Created a Cloudflared tunnel via<br><strong>Zero Trust &rarr; Networks &rarr; Connectors</strong></p>
                 <pre><code class="language-yaml" data-trim data-noescape data-line-numbers>services:
   tunnel:
     image: cloudflare/cloudflared
@@ -392,8 +369,8 @@ networks:
             </section>
             <section>
                 <h3>Public hostname</h3>
-                <p>Added a public hostname pointing to the Tailscale IP address.</p>
-                <img src="assets/images/public-hostname.png" alt="Public hostname record">
+                <p>Added a public hostname pointing to the IP address of your server.</p>
+                <img src="assets/images/public-hostname.png" width="700" alt="Public hostname record">
                 <p>Service accessible from the internet, server stays hidden</p>
             </section>
         </section>
